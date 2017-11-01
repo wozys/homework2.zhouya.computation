@@ -1,0 +1,86 @@
+---
+title: 'Homework2: Accelarated Proximal Algrithm for Matrix Completion'
+author: "Ya Zhou"
+date: "2017/11/1"
+output: html_document
+---
+# The Origima Matrix Taken from Google
+- The original matrix img
+- Construct the graphics for img
+```{r}
+library(jpeg)
+img = readJPEG("./灰度图.jpg")
+img = img[,,1]
+par(mar = c(0,0,0,0))
+plot(0,0,type = "n")
+rasterImage(img, -1, -1, 1, 1)
+```
+
+#Cencer Completely at Random 40% information of the Matrix
+```{r}
+#in order to achieve repetition
+set.seed(100)
+a<-matrix(,642,500)
+for(i in 1:642){
+  a[i,]=rep(i,500)
+}
+b<-matrix(,642,500)
+for(i in 1:500){
+  b[,i]=rep(i,642)
+}
+a1<-sample(a,642*500*0.6)
+b1<-sample(b,642*500*0.6)
+# c1 is the set of coordinates for uncensored point in the matrix
+c1<-matrix(c(a1,b1),642*500*0.6,2)
+Xomega<-matrix(0,642,500)
+X=img
+for(i in 1:192600){
+  Xomega[c1[i,1],c1[i,2]]=X[c1[i,1],c1[i,2]]
+}
+#now, the Xomega store the censored data from img
+par(mar = c(0,0,0,0))
+plot(0,0,type = "n")
+rasterImage(Xomega, -1, -1, 1, 1)
+```
+
+# the Accerlerated Aproximal Algorithm for Matrix Completion
+- We set the tuning parameter of the penalty term lambda=0.1
+- The total iteration number is 91
+
+```{r}
+library(imageSoft)
+img2<-homework2(Xomega,c1,0.1)
+par(mar = c(0,0,0,0))
+plot(0,0,type = "n")
+rasterImage(img2, -1, -1, 1, 1)
+```
+
+# Explanation 
+
+# Two papers
+- We achieve this based on (2.10) the following paper
+- JIAN-FENG CAI⇤, EMMANUEL J. CANDE`S†, AND ZUOWEI SHEN‡.A SINGULAR VALUE THRESHOLDING ALGORITHM FOR MATRIX COMPLETION
+- We accelerate (2.10) by referring the folloing paper
+- Beck, A., Teboulle, M. (2009) A Fast Iterative Shrinkage-Thresholding Algorithm for Linear Inverse Problems. SIAM J. IMAGING SCIENCES.
+
+# Description for the Algorithm
+###The algorithm is based on:
+- $X^k =\mathcal{D}_{\lambda \delta_{k-1}}(X^{k-1}+\delta_{k-1}P_{\Omega}(X-X^{k-1}))$ 
+- where $\mathcal{D}_{\lambda \delta_{k-1}}$ is the  proximity operator defined in the first paper and $X$ is the input matirx and $\{\delta_k\}$ is a sequence of positive step sizes.
+
+###We rewright it as:
+- $X^k=\mathcal{D}_{\lambda \delta_{k-1}}(Y^{k-1})$
+- $Y^k=X^k-\delta_{k-1}P_{\Omega}(X-X^{k-1})$
+- In my algorithm, I set all the step size $\delta_k=1$
+
+###The above is accelerated by the equation: 
+- $Z^k=X^k+(\frac{t_{k-1}-1}{t_k})(X^k-X^{k-1})$
+- Replace $X_k$ by $Z^k$, we obtain:
+- $Y^k=Z^k-\delta_{k-1}P_{\Omega}(X-Z^{k-1})$
+- And $X^{k+1}$ can be updated by
+- $X^{k+1}=\mathcal{D}_{\lambda \delta_{k}}(Y^{k})$
+- In my algorithm, I set the starting point $t_1=1$ and the updated step of $t_k$ is the same as the content in our class.
+
+#Thanks
+###Directed by Shiyuan He
+###Written by Ya Zhou

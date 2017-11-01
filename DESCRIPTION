@@ -1,0 +1,12 @@
+Package: zhouyahomework2
+Type: Package
+Title: homework 2 of Ya Zhou
+Version: 1.0
+Date: 2017-11-01
+Author: Zhou Ya
+Maintainer: Zhou Ya
+     <yazhou@ruc.edu.com>
+Description: Accelerated Proximal Gradient
+License: GNU GPLv3
+Imports: Rcpp (>= 0.12.13)
+LinkingTo: Rcpp, RcppArmadillo
